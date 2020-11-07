@@ -9,7 +9,7 @@ interface NewItemFormProps {
 export const NewItemForm = ({ onAdd }: NewItemFormProps) => {
   const [text, setText] = useState("")
   const inputRef = useFocus()
-  const disabled = !text.length
+
   return (
     <NewItemFormContainer>
       <NewItemInput
@@ -17,7 +17,7 @@ export const NewItemForm = ({ onAdd }: NewItemFormProps) => {
         value={text}
         onChange={e => setText(e.target.value)}
       />
-      <NewItemButton onClick={() => onAdd(text)} disabled={disabled}>Create</NewItemButton>
+      <NewItemButton onClick={() => onAdd(text)}>Create</NewItemButton>
     </NewItemFormContainer>
   )
 }

@@ -16,8 +16,8 @@ interface List {
 }
 
 export interface AppState {
+  draggedItem: DragItem | undefined
   lists: List[]
-  draggedItem: DragItem | undefined;
 }
 
 type Action =
@@ -40,13 +40,24 @@ type Action =
         hoverIndex: number
       }
     }
+  | {
+      type: "MOVE_TASK"
+      payload: {
+        dragIndex: number
+        hoverIndex: number
+        sourceColumn: string
+        targetColumn: string
+      }
+    }
 
 interface AppStateContextProps {
   state: AppState
   dispatch: React.Dispatch<Action>
 }
 
-const AppStateContext = createContext<AppStateContextProps>({} as AppStateContextProps)
+const AppStateContext = createContext<AppStateContextProps>(
+  {} as AppStateContextProps
+)
 
 const appStateReducer = (state: AppState, action: Action): AppState => {
   switch (action.type) {
@@ -81,13 +92,26 @@ const appStateReducer = (state: AppState, action: Action): AppState => {
       state.lists = moveItem(state.lists, dragIndex, hoverIndex)
       return { ...state }
     }
+    case "MOVE_TASK": {
+      const {
+        dragIndex,
+        hoverIndex,
+        sourceColumn,
+        targetColumn
+      } = action.payload
+      const sourceLaneIndex = findItemIndexById(state.lists, sourceColumn)
+      const targetLaneIndex = findItemIndexById(state.lists, targetColumn)
+      const item = state.lists[sourceLaneIndex].tasks.splice(dragIndex, 1)[0]
+      state.lists[targetLaneIndex].tasks.splice(hoverIndex, 0, item)
+      return { ...state }
+    }
     default: {
       return state
     }
   }
 }
 
-const appData: AppState= {
+const appData: AppState = {
   draggedItem: undefined,
   lists: [
     {
